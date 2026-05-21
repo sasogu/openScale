@@ -32,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.Copyright
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.History
@@ -157,6 +158,14 @@ fun AboutScreen(
             supportingText = stringResource(R.string.official_project_page_label),
             leadingIconVector = Icons.Filled.Home,
             leadingIconContentDescription = stringResource(R.string.homepage_icon_content_description),
+            url = projectHomepageUrl,
+            uriHandler = uriHandler
+        )
+        InfoListItem(
+            headlineText = stringResource(R.string.fork_of_label),
+            supportingText = stringResource(R.string.fork_of_supporting_label),
+            leadingIconVector = Icons.Filled.CallSplit,
+            leadingIconContentDescription = stringResource(R.string.fork_icon_content_description),
             url = projectHomepageUrl,
             uriHandler = uriHandler
         )

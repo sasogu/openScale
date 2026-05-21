@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.overview
 
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -56,6 +58,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Button
@@ -618,6 +621,19 @@ fun OverviewScreen(
                                                 )
                                             },
                                             onDelete                  = { measurementToDelete = aggItem },
+                                            onShare                   = {
+                                                val shareText = buildShareText(
+                                                    context               = context,
+                                                    measurementWithValues = enrichedItem.measurementWithValues,
+                                                    valuesWithTrend       = enrichedItem.valuesWithTrend,
+                                                )
+                                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                                    type = "text/plain"
+                                                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_measurement_title))
+                                                    putExtra(Intent.EXTRA_TEXT, shareText)
+                                                }
+                                                context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_measurement_title)))
+                                            },
                                             isHighlighted             = (highlightedMeasurementId ==
                                                     enrichedItem.measurementWithValues.measurement.id),
                                         )
@@ -721,6 +737,33 @@ suspend fun LazyListState.smartScrollTo(index: Int) {
     if (dist > 20) scrollToItem(index) else animateScrollToItem(index)
 }
 
+fun buildShareText(
+    context: Context,
+    measurementWithValues: MeasurementWithValues,
+    valuesWithTrend: List<ValueWithDifference>,
+): String {
+    val dateStr = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault())
+        .format(Date(measurementWithValues.measurement.timestamp))
+    val sb = StringBuilder()
+    sb.appendLine("openScale — $dateStr")
+    valuesWithTrend
+        .filter { it.currentValue.type.isEnabled }
+        .forEach { vwd ->
+            val type  = vwd.currentValue.type
+            val value = vwd.currentValue.value
+            val displayValue = when (type.inputType) {
+                InputFieldType.FLOAT -> value.floatValue?.let { LocaleUtils.formatValueForDisplay(it.toString(), type.unit) }
+                InputFieldType.INT   -> value.intValue?.let { LocaleUtils.formatValueForDisplay(it.toString(), type.unit) }
+                InputFieldType.TEXT  -> value.textValue
+                InputFieldType.DATE  -> value.dateValue?.let { DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(it)) }
+                InputFieldType.TIME  -> value.dateValue?.let { DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(it)) }
+                InputFieldType.USER  -> null
+            } ?: return@forEach
+            sb.appendLine("${type.getDisplayName(context)}: $displayValue")
+        }
+    return sb.toString().trimEnd()
+}
+
 // ---------------------------------------------------------------------------
 // MeasurementCard
 // ---------------------------------------------------------------------------
@@ -734,6 +777,7 @@ fun MeasurementCard(
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: (() -> Unit)?,
+    onShare: (() -> Unit)? = null,
     isHighlighted: Boolean = false,
     isAggregated: Boolean = false,
     rawCount: Int = 1,
@@ -804,6 +848,15 @@ fun MeasurementCard(
                         )
                     }
                 } else {
+                    if (onShare != null) {
+                        IconButton(onClick = onShare, modifier = Modifier.size(iconButtonSize)) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = stringResource(R.string.action_share_measurement_desc, headerLabel),
+                                tint               = actionIconColor,
+                            )
+                        }
+                    }
                     if (onDelete != null) {
                         IconButton(onClick = onDelete, modifier = Modifier.size(iconButtonSize)) {
                             Icon(

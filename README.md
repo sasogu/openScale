@@ -1,6 +1,7 @@
-&nbsp; <img src="https://github.com/oliexdev/openScale/blob/master/fastlane/metadata/android/en-GB/images/icon.png" alt="openScale logo" height="60"/> &nbsp;openScale [![CI](https://github.com/oliexdev/openScale/actions/workflows/ci_master.yml/badge.svg)](https://github.com/oliexdev/openScale/actions/workflows/ci_master.yml)
-[![Translation status](https://hosted.weblate.org/widgets/openscale/-/strings/svg-badge.svg)](https://hosted.weblate.org/engage/openscale/?utm_source=widget)
+&nbsp; <img src="https://github.com/oliexdev/openScale/blob/master/fastlane/metadata/android/en-GB/images/icon.png" alt="openScale logo" height="60"/> &nbsp;openScale [![CI](https://github.com/sasogu/openScale/actions/workflows/ci_master.yml/badge.svg)](https://github.com/sasogu/openScale/actions/workflows/ci_master.yml)
 =========
+
+> **Fork** of [openScale](https://github.com/oliexdev/openScale) by [olie.xdev](https://github.com/oliexdev) — licensed under GPL-3.0
 
 Open-source weight and body metrics tracker, with support for Bluetooth scales
 
@@ -14,7 +15,7 @@ Open-source weight and body metrics tracker, with support for Bluetooth scales
 > [!NOTE]
 > On [Google Play](https://play.google.com/store/apps/details?id=com.health.openscale.oss) the **openScale** version is offered as an open beta.
 > 
-> For the latest development state, install the latest [openScale dev](https://github.com/oliexdev/openScale/releases/tag/dev-build) build from the [GitHub release page](https://github.com/oliexdev/openScale/releases).
+> For the latest development state, install the latest [openScale dev](https://github.com/sasogu/openScale/releases/tag/dev-build) build from the [GitHub release page](https://github.com/sasogu/openScale/releases).
 > Please be aware that the development version, may contain bugs, and will not receive automatic updates.
 
 # Summary :clipboard:

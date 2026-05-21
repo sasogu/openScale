@@ -95,6 +95,8 @@
     <string name="action_add_measurement_desc">Añadir nueva medición</string>
     <string name="action_edit_measurement_desc">Editar medición de %1$s</string>
     <string name="action_delete_measurement_desc">Eliminar medición de %1$s</string>
+    <string name="action_share_measurement_desc">Compartir medición de %1$s</string>
+    <string name="share_measurement_title">Medición openScale</string>
     <string name="toast_duplicate_timestamp">Esta marca de tiempo coincide con tu última medición. Elige una marca de tiempo diferente.</string>
     <string name="no_measurements_title">Aún no hay mediciones</string>
     <string name="no_measurements_message">Añade tu primera medición para empezar a seguir tu progreso.</string>
@@ -482,6 +484,9 @@
     <string name="homepage_icon_content_description">Icono de inicio</string>
     <string name="software_license_details_label">Detalles de la licencia del software</string>
     <string name="license_icon_content_description">Icono de licencia</string>
+    <string name="fork_of_label">Fork de openScale por olie.xdev</string>
+    <string name="fork_of_supporting_label">Proyecto original (GPL-3.0)</string>
+    <string name="fork_icon_content_description">Icono de fork</string>
     <string name="diagnostics_title">Diagnóstico</string>
     <string name="file_logging_icon_content_description">Icono de registro en archivo</string>
     <string name="file_logging_label">Registro en archivo</string>

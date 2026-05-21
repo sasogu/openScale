@@ -113,6 +113,8 @@
     <string name="action_add_measurement_desc">Add new measurement</string>
     <string name="action_edit_measurement_desc">Edit measurement from %1$s</string> <!-- %1$s is date -->
     <string name="action_delete_measurement_desc">Delete measurement from %1$s</string> <!-- %1$s is date -->
+    <string name="action_share_measurement_desc">Share measurement from %1$s</string> <!-- %1$s is date -->
+    <string name="share_measurement_title">openScale measurement</string>
     <string name="toast_duplicate_timestamp">This timestamp matches your last measurement. Please choose a different timestamp.</string>
     <string name="no_measurements_title">No Measurements Yet</string>
     <string name="no_measurements_message">Add your first measurement to start tracking your progress.</string>
@@ -632,6 +634,9 @@
     <string name="homepage_icon_content_description">Homepage Icon</string>
     <string name="software_license_details_label">Software license details</string>
     <string name="license_icon_content_description">License Icon</string>
+    <string name="fork_of_label">Fork of openScale by olie.xdev</string>
+    <string name="fork_of_supporting_label">Original project (GPL-3.0)</string>
+    <string name="fork_icon_content_description">Fork Icon</string>
     <string name="diagnostics_title">Diagnostics</string>
     <string name="file_logging_icon_content_description">File Logging Icon</string>
     <string name="file_logging_label">File Logging</string>
