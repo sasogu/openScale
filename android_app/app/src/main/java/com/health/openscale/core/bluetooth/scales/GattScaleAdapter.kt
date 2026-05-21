@@ -45,6 +45,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeout
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 
 // -------------------------------------------------------------------------------------------------
 // GATT adapter (BLE)
@@ -74,7 +75,7 @@ class GattScaleAdapter(
     )
 
     private val deferredMap = ConcurrentHashMap<UUID, PendingOp>()
-    private var nextOpId = 0L
+    private val nextOpId = AtomicLong(0)
 
     private val ioMutex = Mutex()
 
@@ -231,11 +232,15 @@ class GattScaleAdapter(
         ) {
             LogManager.d(TAG,"\u2190 received data chr=${characteristic.uuid} len=${value.size} status=${status} ${value.toHexPreview(24)}")
 
-            handler.handleNotification(characteristic.uuid, value)
-
-            deferredMap[characteristic.uuid]?.let { op ->
-                op.deferred.complete(Unit)
-                deferredMap.remove(characteristic.uuid)
+            try {
+                handler.handleNotification(characteristic.uuid, value)
+            } finally {
+                // Always unblock any pending GATT operation waiting on this characteristic,
+                // even if handleNotification throws \u2014 otherwise the op queue stalls until timeout.
+                deferredMap[characteristic.uuid]?.let { op ->
+                    op.deferred.complete(Unit)
+                    deferredMap.remove(characteristic.uuid)
+                }
             }
         }
     }
@@ -250,7 +255,7 @@ class GattScaleAdapter(
                 val p = currentPeripheral ?: return@trySend
                 LogManager.d(TAG, "→ set notify on chr=$characteristic svc=$service")
 
-                val opId = ++nextOpId
+                val opId = nextOpId.incrementAndGet()
                 val deferred = CompletableDeferred<Unit>()
                 deferredMap[characteristic] = PendingOp(opId, deferred)
 
@@ -286,7 +291,7 @@ class GattScaleAdapter(
                 val p = currentPeripheral ?: return@trySend
                 val ch = p.getCharacteristic(service, characteristic) ?: return@trySend
 
-                val opId = ++nextOpId
+                val opId = nextOpId.incrementAndGet()
                 val deferred = CompletableDeferred<Unit>()
                 deferredMap[characteristic] = PendingOp(opId, deferred)
 
@@ -338,7 +343,7 @@ class GattScaleAdapter(
                 val p = currentPeripheral ?: return@trySend
                 val ch = p.getCharacteristic(service, characteristic) ?: return@trySend
 
-                val opId = ++nextOpId
+                val opId = nextOpId.incrementAndGet()
                 val deferred = CompletableDeferred<Unit>()
                 deferredMap[characteristic] = PendingOp(opId, deferred)
 

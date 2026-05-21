@@ -410,6 +410,7 @@ class MiScaleHandler : ScaleDeviceHandler() {
         return true
     }
 
+    @Synchronized
     private fun appendHistoryChunk(chunk: ByteArray) {
         if (chunk.size < 2) return
         histBuf.write(chunk, 0, chunk.size)
@@ -430,6 +431,7 @@ class MiScaleHandler : ScaleDeviceHandler() {
         }
     }
 
+    @Synchronized
     private fun flushHistory() {
         val leftover = histBuf.toByteArray()
         if (leftover.isNotEmpty() && leftover.size % 10 == 0) {
@@ -447,18 +449,26 @@ class MiScaleHandler : ScaleDeviceHandler() {
 
     // ----- Helpers -----
 
+    @Synchronized
     private fun histBufReset() {
         try { histBuf.reset() } catch (_: Exception) {}
     }
 
     private fun unique16(): Int = currentAppUser().id
 
-    private fun parseMinuteDate(y: Int, m: Int, d: Int, h: Int, min: Int): Date? =
-        runCatching {
+    private fun parseMinuteDate(y: Int, m: Int, d: Int, h: Int, min: Int): Date? {
+        if (y < 2000 || y > 2100) return null
+        if (m < 1 || m > 12) return null
+        if (d < 1 || d > 31) return null
+        if (h < 0 || h > 23) return null
+        if (min < 0 || min > 59) return null
+        return runCatching {
             val sdf = SimpleDateFormat("yyyy/MM/dd/HH/mm", Locale.US)
+            sdf.isLenient = false
             sdf.timeZone = TimeZone.getTimeZone("UTC")
             sdf.parse("$y/$m/$d/$h/$min")
         }.getOrNull()
+    }
 
     private fun plausible(date: Date, years: Int = 20): Boolean {
         val now = Calendar.getInstance()
@@ -483,7 +493,7 @@ class MiScaleHandler : ScaleDeviceHandler() {
     private fun armHistoryFallbackTimer(svcPrimary: UUID, svcAlternate: UUID) {
         historyFallbackJob?.cancel()
         historyFallbackJob = scope.launch {
-            delay(1000)
+            delay(2000)
             if (!historyMode || pendingHistoryCount >= 0) return@launch
 
             logW("No history count response on primary; attempting fallback (ALL records).")
