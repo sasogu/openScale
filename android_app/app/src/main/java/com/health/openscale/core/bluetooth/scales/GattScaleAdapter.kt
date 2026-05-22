@@ -80,6 +80,9 @@ class GattScaleAdapter(
     private val ioMutex = Mutex()
 
     private var connectAttempts = 0
+    // User supplied to doConnect(); used as fallback in onServicesDiscovered if
+    // selectedUserSnapshot has not yet been populated by the init coroutine.
+    @Volatile private var pendingConnectUser: ScaleUser? = null
 
     init {
         // Worker coroutine processes queued BLE operations sequentially
@@ -183,7 +186,8 @@ class GattScaleAdapter(
             if (tuning.requestHighConnectionPriority) runCatching { peripheral.requestConnectionPriority(ConnectionPriority.HIGH) }
             if (tuning.requestMtuBytes > 23) runCatching { peripheral.requestMtu(tuning.requestMtuBytes) }
 
-            val user = selectedUserSnapshot ?: run {
+            val user = selectedUserSnapshot ?: pendingConnectUser ?: run {
+                LogManager.e(TAG, "onServicesDiscovered: no user context available, cancelling connection")
                 central.cancelConnection(peripheral); return
             }
 
@@ -385,6 +389,7 @@ class GattScaleAdapter(
     // Connection management
     // -------------------------------------------------------------------------------------------------
     override fun doConnect(address: String, selectedUser: ScaleUser) {
+        pendingConnectUser = selectedUser
         if (!::central.isInitialized) {
             central = BluetoothCentralManager(context, centralCallback, mainHandler)
         }
@@ -419,5 +424,6 @@ class GattScaleAdapter(
         runCatching { if (::central.isInitialized) central.stopScan() }
         currentPeripheral?.let { runCatching { central.cancelConnection(it) } }
         currentPeripheral = null
+        pendingConnectUser = null
     }
 }

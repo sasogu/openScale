@@ -329,7 +329,10 @@ abstract class ModernScaleAdapter(
                 scaleUser
                     ?: selectedUserSnapshot
                     ?: withTimeoutOrNull(750) {
-                        userFacade.observeSelectedUser().first()
+                        // Use first { it != null } so a transient null emission (e.g. before
+                        // DataStore has loaded the stored user ID) does not cause an immediate
+                        // failure. We wait up to 750 ms for a real user to arrive.
+                        userFacade.observeSelectedUser().first { it != null }
                     }?.let(::mapUser)
 
             if (user == null) {
